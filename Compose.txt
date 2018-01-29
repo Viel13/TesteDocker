@@ -1,0 +1,39 @@
+version: '3'
+services:
+  jenkins:
+    build:
+      context: /home/victor/docker
+      dockerfile: Dockerfile
+    image: pepe-jenkins
+    container_name: pepe-jenkins
+    environment:
+      - targetpath="none"
+      - targetapplication="none"
+    ports:
+      - "8888:8080"
+    volumes:
+      - .:/root/
+  nexus:
+    image: sonatype/nexus
+    ports:
+      - "8090:8081"
+  gitlab:
+    image: 'gitlab/gitlab-ce:latest'
+    restart: always
+    hostname: 'gitlab.viel13.com'
+    ports:
+      - '8082:80'
+    volumes:
+      - '/srv/gitlab/config:/etc/gitlab'
+      - '/srv/gitlab/logs:/var/log/gitlab'
+      - '/srv/gitlab/data:/var/opt/gitlab'
+
+_____
+
+RUN apt-get update && apt-get install -y git curl docker && \
+    rm -rf /var/lib/apt/lists/* && \
+    wget https://releases.hashicorp.com/terraform/0.11.2/terraform_0.11.2_linux_amd64.zip && \
+    mkdir -p /var/terraform && \
+    unzip ./terraform_0.11.2_linux_amd64 -d /var/terraform
+
+ENV PATH="/var/terraform:${PATH}"
